@@ -21,11 +21,11 @@ class SnakeEnv(gym.Env):
         self.observation_space = spaces.Dict(
             {
                 "head": spaces.Box(low=0, high=self.size - 1, shape=(2,), dtype=int),
-                "body": spaces.Tuple((spaces.Discrete(self.size - 1),  # Wrap Discrete in a tuple
-                                      spaces.Box(low=-1, high=self.size - 1, shape=(2,), dtype=int))),
+                "body": spaces.Box(low=-1, high=self.size - 1, shape=(2 * (self.size - 1),), dtype=int),
                 "food": spaces.Box(low=0, high=self.size - 1, shape=(2,), dtype=int)
             }
         )
+
         self.food = self._generate_food()  # Generiamo casualmente la posizione del cibo, diversa da quella della testa
         self.last_action = -1
 
@@ -61,7 +61,8 @@ class SnakeEnv(gym.Env):
 
     def _generate_food(self):
         food_position = [np.random.randint(0, self.size), np.random.randint(0, self.size)]
-        while food_position in [self.head] + self.body:  # Controllo che il cibo non sia generato dove si trova lo Snake
+        while food_position in [list(self.head)] + list(self.body):  # Controllo che il cibo non sia generato dove si
+            # trova lo Snake
             food_position = [np.random.randint(0, self.size), np.random.randint(0, self.size)]
         return food_position
 
@@ -94,7 +95,9 @@ class SnakeEnv(gym.Env):
         return {"head": self.head, "body": self.body, "food": self.food}
 
     def _get_info(self):
-        return {"distance": np.linalg.norm(self.head - self.food, ord=2), "snake_size": self.snake_length}
+        head_np = np.array(self.head)
+        food_np = np.array(self.food)
+        return {"distance": np.linalg.norm(head_np - food_np, ord=2), "snake_size": self.snake_length}
 
     def reset(self, seed=None, options=None):
         super().reset(seed=seed)
@@ -177,8 +180,10 @@ class SnakeEnv(gym.Env):
             canvas,
             (255, 0, 0),
             pygame.Rect(
-                pix_square_size * self.head,
-                (pix_square_size, pix_square_size),
+                int(pix_square_size * self.head[0]),
+                int(pix_square_size * self.head[1]),
+                int(pix_square_size),
+                int(pix_square_size),
             ),
         )
 
@@ -189,8 +194,10 @@ class SnakeEnv(gym.Env):
                     canvas,
                     (255, 0, 0),
                     pygame.Rect(
-                        pix_square_size * self.body[i],
-                        (pix_square_size, pix_square_size),
+                        int(pix_square_size * self.body[i][0]),
+                        int(pix_square_size * self.body[i][1]),
+                        int(pix_square_size),
+                        int(pix_square_size),
                     ),
                 )
 
@@ -198,8 +205,9 @@ class SnakeEnv(gym.Env):
         pygame.draw.circle(
             canvas,
             (0, 0, 255),
-            (self.food + 0.5) * pix_square_size,
-            pix_square_size / 3,
+            (int((self.food[0] + 0.5) * pix_square_size),
+             int((self.food[1] + 0.5) * pix_square_size)),
+            int(pix_square_size / 3),
         )
 
         for x in range(self.size + 1):
