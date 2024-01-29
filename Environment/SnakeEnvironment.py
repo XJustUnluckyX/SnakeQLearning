@@ -21,8 +21,8 @@ class SnakeEnv(gym.Env):
         self.observation_space = spaces.Dict(
             {
                 "head": spaces.Box(low=0, high=self.size - 1, shape=(2,), dtype=int),
-                "body": spaces.Tuple(Discrete(self.size - 1),
-                                     spaces.Box(low=-1, high=self.size - 1, shape=(2,), dtype=int)),
+                "body": spaces.Tuple((spaces.Discrete(self.size - 1),  # Wrap Discrete in a tuple
+                                      spaces.Box(low=-1, high=self.size - 1, shape=(2,), dtype=int))),
                 "food": spaces.Box(low=0, high=self.size - 1, shape=(2,), dtype=int)
             }
         )
