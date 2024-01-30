@@ -6,3 +6,8 @@ numpy==1.24.4
 pygame==2.5.2
 -e git+https://github.com/XJustUnluckyX/SnakeQLearning.git@3d4f4b27352d3b96214bbb4951e02bc82b5806fe#egg=SnakeQl&subdirectory=environment
 zipp==3.17.0
+
+setuptools~=65.5.1
+torch~=2.1.2
+matplotlib~=3.8.2
+ipython~=8.20.0
