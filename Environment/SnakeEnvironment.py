@@ -15,13 +15,14 @@ class SnakeEnv(gym.Env):
         self.size = grid_size
         self.window_size = 512
         self.body = self._init_body()  # Il body è una tupla di dimensione 25, in cui la cella più vicina alla testa è
+        self.actions = self._init_actions()
         # in prima posizione della tupla
         self.head = self._spawn_head()  # Generiamo casualmente la posizione di inizio
         self.action_space = spaces.Discrete(4)  # Mosse disponibili: 0: Su, 1: Giù, 2: Sx, 3: Dx
         self.observation_space = spaces.Dict(
             {
                 "head": spaces.Box(low=0, high=self.size - 1, shape=(2,), dtype=int),
-                "body": spaces.Box(low=-1, high=self.size - 1, shape=(2 * (self.size - 1),), dtype=int),
+                "actions": spaces.Box(low=-1, high=3, shape=(1 * (self.size - 1),), dtype=int),
                 "food": spaces.Box(low=0, high=self.size - 1, shape=(2,), dtype=int)
             }
         )
@@ -92,7 +93,7 @@ class SnakeEnv(gym.Env):
         return body
 
     def _get_obs(self):
-        return {"head": self.head, "body": self.body, "food": self.food}
+        return {"head": self.head, "actions": self.body, "food": self.food}
 
     def _get_info(self):
         head_np = np.array(self.head)
@@ -104,6 +105,7 @@ class SnakeEnv(gym.Env):
         self.food = []
         self.head = self._spawn_head()
         self.body = self._init_body()
+        self.actions = self._init_actions()
         self.food = self._generate_food()
         self._update_snake_length()
         obs = self._get_obs()
@@ -132,10 +134,17 @@ class SnakeEnv(gym.Env):
             self.body[i] = self.body[j]
         self.body[0] = previous_head
 
+
+    def _increase_actions(self, last_action):
+        for i in range(self.size - 1, 1, -1):
+            j = i - 1
+            self.actions[i] = self.actions[j]
+        self.actions[0] = last_action
+
     def step(self, action):
         previous_head = self.head
         self._update_snake_position(action)
-
+        self._increase_actions(action)
         done = False
         if self._check_collision():
             reward = -1000  # Penalità per collisione
@@ -242,3 +251,7 @@ class SnakeEnv(gym.Env):
         if self.window is not None:
             pygame.display.quit()
             pygame.quit()
+
+    def _init_actions(self):
+        actions = ([-1] for _ in range(self.size - 1))
+        return actions
