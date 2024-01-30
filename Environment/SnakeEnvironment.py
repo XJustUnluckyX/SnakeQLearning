@@ -4,17 +4,17 @@ import gym
 import pygame
 import numpy as np
 from gym import spaces
-from gym.spaces import Discrete
 
 
 class SnakeEnv(gym.Env):
-    metadata = {"render_modes": ["human", "rgb_array"], "render_fps": 4}
+    metadata = {"render_modes": ["human", "rgb_array"], "render_fps": 12000}
 
     def __init__(self, grid_size, render_mode):
         super(SnakeEnv, self).__init__()
         self.size = grid_size
+        self.total_size = self.size * self.size
         self.window_size = 512
-        self.body = self._init_body()  # Il body è una tupla di dimensione 25, in cui la cella più vicina alla testa è
+        self.body = []
         self.actions = self._init_actions()
         # in prima posizione della tupla
         self.head = self._spawn_head()  # Generiamo casualmente la posizione di inizio
@@ -22,7 +22,7 @@ class SnakeEnv(gym.Env):
         self.observation_space = spaces.Dict(
             {
                 "head": spaces.Box(low=0, high=self.size - 1, shape=(2,), dtype=int),
-                "actions": spaces.Box(low=-1, high=3, shape=(1 * (self.size - 1),), dtype=int),
+                "actions": spaces.Box(low=-1, high=3, shape=(1 * self.total_size - 1,), dtype=int),
                 "food": spaces.Box(low=0, high=self.size - 1, shape=(2,), dtype=int)
             }
         )
@@ -72,10 +72,7 @@ class SnakeEnv(gym.Env):
         return head_position
 
     def _update_snake_length(self):
-        self.snake_length = 1
-        for x in self.body:
-            if x != [-1, -1]:
-                self.snake_length = + 1
+        self.snake_length = len(self.body)+1
 
     def _check_collision(self):
         if (
@@ -88,12 +85,9 @@ class SnakeEnv(gym.Env):
             return True
         return False
 
-    def _init_body(self):
-        body = tuple([-1, -1] for _ in range(self.size - 1))
-        return body
 
     def _get_obs(self):
-        return {"head": self.head, "actions": self.body, "food": self.food}
+        return {"head": self.head, "actions": self.actions, "food": self.food}
 
     def _get_info(self):
         head_np = np.array(self.head)
@@ -104,7 +98,7 @@ class SnakeEnv(gym.Env):
         super().reset(seed=seed)
         self.food = []
         self.head = self._spawn_head()
-        self.body = self._init_body()
+        self.body = []
         self.actions = self._init_actions()
         self.food = self._generate_food()
         self._update_snake_length()
@@ -114,31 +108,12 @@ class SnakeEnv(gym.Env):
             self._render_frame()
         return obs, info
 
-    def _update_body(self, previous_head):  # Aggiorna i body in modo da traslare tutte le celle di uno e di rimuovere
-        # l'ultima cella diversa dal valore [-1, -1]
-        for i in range(self.size - 1, 1, -1):
-            j = i - 1
-            self.body[i] = self.body[j]
-        self.body[0] = previous_head
-
-        for i in range(self.size - 2):
-            if self.body[i] != [-1, -1] and self.body[i + 1] == [-1, -1]:
-                self.body[i] = [-1, -1]
-                return
-
-        return
-
-    def _increase_body(self, previous_head):
-        for i in range(self.size - 1, 1, -1):
-            j = i - 1
-            self.body[i] = self.body[j]
-        self.body[0] = previous_head
-
-
     def _increase_actions(self, last_action):
-        for i in range(self.size - 1, 1, -1):
+        i = (self.size * self.size) - 2
+        while i >= 1:
             j = i - 1
             self.actions[i] = self.actions[j]
+            i -= 1
         self.actions[0] = last_action
 
     def step(self, action):
@@ -152,13 +127,13 @@ class SnakeEnv(gym.Env):
         elif self.head == self.food:
             reward = 10  # Ricompensa per mangiare il cibo
             self.food = self._generate_food()
-            self._increase_body(previous_head)
         else:
             # Ricompensa intermedia per avvicinamento al cibo
             reward = -1 * math.dist(self.head, self.food)
-            if self.snake_length != 1:
-                self._update_body(previous_head)
+            if self.snake_length > 1:
+                self.body.pop()
 
+        self.body.append(list(previous_head))  # La testa precedente diventa l'ultimo valore della lista del body
         self._update_snake_length()
 
         if self.render_mode == "human":
@@ -179,7 +154,7 @@ class SnakeEnv(gym.Env):
             self.clock = pygame.time.Clock()
 
         canvas = pygame.Surface((self.window_size, self.window_size))
-        canvas.fill((255, 255, 255))
+        canvas.fill((0, 0, 0))
         pix_square_size = (
                 self.window_size / self.size
         )
@@ -187,7 +162,7 @@ class SnakeEnv(gym.Env):
         # head
         pygame.draw.rect(
             canvas,
-            (255, 0, 0),
+            (0, 255, 0),
             pygame.Rect(
                 int(pix_square_size * self.head[0]),
                 int(pix_square_size * self.head[1]),
@@ -197,11 +172,11 @@ class SnakeEnv(gym.Env):
         )
 
         # body != [-1, -1]
-        for i in range(self.size - 1):
+        for i in range(len(self.body)):
             if self.body[i] != [-1, -1]:
                 pygame.draw.rect(
                     canvas,
-                    (255, 0, 0),
+                    (0, 0, 255),
                     pygame.Rect(
                         int(pix_square_size * self.body[i][0]),
                         int(pix_square_size * self.body[i][1]),
@@ -213,7 +188,7 @@ class SnakeEnv(gym.Env):
         # food
         pygame.draw.circle(
             canvas,
-            (0, 0, 255),
+            (255, 0, 0),
             (int((self.food[0] + 0.5) * pix_square_size),
              int((self.food[1] + 0.5) * pix_square_size)),
             int(pix_square_size / 3),
@@ -253,5 +228,5 @@ class SnakeEnv(gym.Env):
             pygame.quit()
 
     def _init_actions(self):
-        actions = ([-1] for _ in range(self.size - 1))
+        actions = np.full((self.size * self.size)-1, 5)
         return actions
