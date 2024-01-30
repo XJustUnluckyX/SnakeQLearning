@@ -6,21 +6,20 @@ from deep_model import Linear_QNet, QTrainer
 from env import Direction, Point
 
 MAX_MEMORY = 100_000
-BATCH_SIZE = 1000
-LR = 0.001  # learning rate
-
-
-# TODO implementare una GridSearch per gli iper-parametri
 
 class QLearner:
 
-    def __init__(self):
-        self.epsilon = 0
-        self.gamma = 0.9
+    def __init__(self, epsilon, gamma, learning_rate, batch_size, epsilon_decay, epsilon_min):
+        self.epsilon = epsilon
+        self.epsilon_decay = epsilon_decay
+        self.epsilon_min = epsilon_min
+        self.gamma = gamma
         self.n_games = 0
+        self.batch_size = batch_size
+        self.learning_rate = learning_rate
 
         self.deep_model = Linear_QNet(11, 256, 3)  # input, hidden, output dim
-        self.q_trainer = QTrainer(self.deep_model, lr=LR, gamma=self.gamma)
+        self.q_trainer = QTrainer(self.deep_model, lr=self.learning_rate, gamma=self.gamma)
         self.memory = deque(maxlen=MAX_MEMORY)
 
     def get_state(self, game):
@@ -68,8 +67,8 @@ class QLearner:
         self.memory.append((state, action, reward, next_state, done))  # Pop dell'item a sx se si raggiunge MAX_MEMORY
 
     def long_memory(self):
-        if len(self.memory) > BATCH_SIZE:
-            mini_sample = random.sample(self.memory, BATCH_SIZE)  # estraggo un campione di tuple
+        if len(self.memory) > self.batch_size:
+            mini_sample = random.sample(self.memory, self.batch_size)  # estraggo un campione di tuple
         else:
             mini_sample = self.memory
 
@@ -80,9 +79,9 @@ class QLearner:
         self.q_trainer.train(state, action, reward, next_state, done)
 
     def get_action(self, state):
-        self.epsilon = 80 - self.n_games #TODO provare con epsilon diversi
+        self.epsilon = max(self.epsilon * self.epsilon_decay, self.epsilon_min)
         last_move = [0, 0, 0]
-        if random.randint(0, 200) < self.epsilon:
+        if random.random() < self.epsilon:
             move = random.randint(0, 2)
             last_move[move] = 1
         else:
