@@ -1,6 +1,7 @@
 import gym.envs.registration
 import QLearning.QLearner as Ql
 import re
+from DeepQLearning.plotter import plot
 
 gym.register(
     id='SnakeQl',
@@ -44,13 +45,18 @@ for a in range(len(learning_rate)):
                     # Parametri di addestramento
                     num_episodes = 500
                     max_reward = -10000
-                    length = 0
-                    temp_max_length = 0
+                    total_score = 0
+                    total_reward = 0
+                    plot_scores = []
+                    plot_mean_scores = []
+                    n_games = 0
+                    total_reward = 0
+
                     # Ciclo di addestramento
                     for episode in range(num_episodes):
                         state, info = env.reset()
-
-                        total_reward = 0
+                        length = 0
+                        temp_max_length = 0
 
                         while True:
                             # Conversione dello stato in un intero, per poter definire la riga corrispondente nella
@@ -68,9 +74,15 @@ for a in range(len(learning_rate)):
                             state = next_state
 
                             if done:
+                                n_games += 1
                                 if max_reward < total_reward:
                                     max_reward = total_reward
                                     temp_max_length = length
+                                total_score += (length-1)
+                                mean_score = total_score / n_games
+                                plot_scores.append(length-1)
+                                plot_mean_scores.append(mean_score)
+                                plot(plot_scores, plot_mean_scores)
                                 break
 
                         # Aggiornamento del tasso di esplorazione

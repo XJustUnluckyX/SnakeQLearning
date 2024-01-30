@@ -126,7 +126,7 @@ class SnakeEnv(gym.Env):
             done = True
             if self.snake_length > 1:
                 self.body.pop()
-            self.body.append(list(previous_head))  # La testa precedente diventa l'ultimo valore della lista del body
+                self.body.append(list(previous_head))  # La testa precedente diventa l'ultimo valore della lista del body
             self._update_snake_length()
             return self._get_obs(), reward, done, self.snake_length, self._get_info()
         elif self.head == self.food:
