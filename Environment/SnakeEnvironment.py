@@ -122,8 +122,13 @@ class SnakeEnv(gym.Env):
         self._increase_actions(action)
         done = False
         if self._check_collision():
-            reward = -1000  # Penalità per collisione
+            reward = -100  # Penalità per collisione
             done = True
+            if self.snake_length > 1:
+                self.body.pop()
+            self.body.append(list(previous_head))  # La testa precedente diventa l'ultimo valore della lista del body
+            self._update_snake_length()
+            return self._get_obs(), reward, done, self.snake_length, self._get_info()
         elif self.head == self.food:
             reward = 10  # Ricompensa per mangiare il cibo
             self.food = self._generate_food()
@@ -139,7 +144,7 @@ class SnakeEnv(gym.Env):
         if self.render_mode == "human":
             self._render_frame()
 
-        return self._get_obs(), reward, done, False, self._get_info()
+        return self._get_obs(), reward, done, self.snake_length, self._get_info()
 
     def render(self):
         if self.render_mode == "rgb_array":

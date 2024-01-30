@@ -13,7 +13,6 @@ grid_size = 5
 
 env = gym.make("SnakeQl", grid_size=grid_size, render_mode="human")
 
-
 observation_space_size = ((grid_size * grid_size) * (grid_size * grid_size)) * (5 * ((grid_size * grid_size) - 1))
 # Possibili posizioni per la Snake head * possibili
 # posizioni per il cibo * possibili valori delle grid_size^2 -1 azioni
@@ -22,11 +21,11 @@ print(observation_space_size)
 action_space = [0, 1, 2, 3]
 
 # Grid Search
-learning_rate = [0.1, 0.2]
-gamma = [0.7, 0.5]
-epsilon_start = [0.6, 0.4]
-epsilon_decay = [0.995, 0.9]
-epsilon_min = [0.03, 0.05, 0.1]
+learning_rate = [0.1, 0.2, 0.3]
+gamma = [0.7, 0.5, 0.4]
+epsilon_start = [0.8, 0.6, 0.4]
+epsilon_decay = [0.99995, 0.995, 0.9]
+epsilon_min = [0.03, 0.05, 0.1, 0.05]
 replay_buffer_size = [1000, 2000]
 best_parameters = []
 
@@ -45,7 +44,7 @@ for a in range(len(learning_rate)):
                                                 gamma[b], epsilon_start[c], epsilon_decay[d], epsilon_min[e])
 
                         # Parametri di addestramento
-                        num_episodes = 1000
+                        num_episodes = 500
                         max_reward = -10000
                         length = 0
                         temp_max_length = 0
@@ -56,12 +55,12 @@ for a in range(len(learning_rate)):
                             total_reward = 0
 
                             while True:
-                                #Conversione dello stato in un intero, per poter definire la riga corrispondente nella
-                                #tabella del Q-learning
+                                # Conversione dello stato in un intero, per poter definire la riga corrispondente nella
+                                # tabella del Q-learning
                                 str_state = re.sub("[^0-9]", "", str(state))
                                 int_state = int(str_state)
                                 action = q_learner.epsilon_greedy_policy(int_state)
-                                next_state, reward, done, length, _ = env.step(action)
+                                next_state, reward, done, length, info = env.step(action)
                                 str_next_state = re.sub("[^0-9]", "", str(next_state))
                                 int_next_state = int(str_state)
                                 # Modifica dell'aggiornamento della Q-table con ricompensa intermedia
@@ -69,12 +68,11 @@ for a in range(len(learning_rate)):
 
                                 total_reward += reward
                                 state = next_state
-                                if max_reward < total_reward:
-                                    max_reward = total_reward
-                                    temp_max_length = length
 
                                 if done:
-                                    # print(f"Episodio: {episode}, Ricompensa totale: {total_reward}")
+                                    if max_reward < total_reward:
+                                        max_reward = total_reward
+                                        temp_max_length = length
                                     break
 
                             # Aggiornamento del tasso di esplorazione
