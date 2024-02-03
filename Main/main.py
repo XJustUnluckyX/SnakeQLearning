@@ -1,7 +1,7 @@
 import gym.envs.registration
 import QLearning.QLearner as Ql
 import re
-from DeepQLearning.plotter import plot
+from plotter import plot
 
 gym.register(
     id='SnakeQl',
