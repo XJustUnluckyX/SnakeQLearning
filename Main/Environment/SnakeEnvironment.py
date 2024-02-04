@@ -210,10 +210,12 @@ class SnakeEnv(gym.Env):
             )
 
         # body
+        body_green = 0
         for i in range(len(self.body)):
+            body_green = min(body_green+(255/(len(self.body)+1)), 150)
             pygame.draw.rect(
                 canvas,
-                (0, 0, 255),
+                (0,body_green,0),
                 pygame.Rect(
                     int(pix_square_size * self.body[i][0]),
                     int(pix_square_size * self.body[i][1]),
