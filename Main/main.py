@@ -41,7 +41,7 @@ for a in range(len(alpha)):
 
                     # Creazione dell'agente Q-learning con i parametri della Grid Search
                     q_learner = Ql.QLearner(observation_space_size, action_space, alpha[a],
-                                            gamma[b], epsilon_start[c], epsilon_decay[d], epsilon_min[e])
+                                            gamma[b], epsilon_start[c], epsilon_decay[d], epsilon_min[e], b_size=10000)
 
                     # Parametri di addestramento
                     num_episodes = 1000
@@ -70,6 +70,18 @@ for a in range(len(alpha)):
                             # Modifica dell'aggiornamento della Q-table con ricompensa intermedia
                             q_learner.update_ql_table(int_state, action, reward, int_next_state)
 
+                            experience = (state, action, reward, next_state, done)
+                            q_learner.replay_buffer.add_experience(experience)
+
+                            if num_episodes % 32 == 0:
+                                batch_size = 32
+                                batch = q_learner.replay_buffer.sample_batch(batch_size)
+
+                                # Aggiornamento della Q-table utilizzando il batch campionato
+                                for experience in batch:
+                                    state, action, reward, next_state, done = experience
+                                    q_learner.update_ql_table(state, action, reward, next_state)
+
                             total_reward += reward
                             state = next_state
 
@@ -82,7 +94,7 @@ for a in range(len(alpha)):
                                 mean_score = total_score / n_games
                                 plot_scores.append(length - 1)
                                 plot_mean_scores.append(mean_score)
-                                #plot(plot_scores, plot_mean_scores)
+                                plot(plot_scores, plot_mean_scores)
                                 break
 
                         # Aggiornamento del tasso di esplorazione

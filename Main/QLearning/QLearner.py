@@ -1,9 +1,25 @@
+from random import random
+
 import numpy as np
+
+
+class ReplayBuffer:  # PER
+    def __init__(self, buffer_size):
+        self.buffer_size = buffer_size
+        self.buffer = []
+
+    def add_experience(self, experience):
+        if len(self.buffer) >= self.buffer_size:
+            self.buffer.pop(0)  # Rimozione della meno recente se il buffer è pieno
+        self.buffer.append(experience)
+
+    def sample_batch(self, batch_size):
+        return random.sample(self.buffer, batch_size)
 
 
 class QLearner:
 
-    def __init__(self, state_space_size, action_space, alpha, gamma, epsilon_start, epsilon_decay, epsilon_min):
+    def __init__(self, state_space_size, action_space, alpha, gamma, epsilon_start, epsilon_decay, epsilon_min, b_size):
         self.state_space_size = state_space_size
         self.action_space = action_space
         self.action_space_size = len(action_space)
@@ -15,6 +31,7 @@ class QLearner:
         self.epsilon_decay = epsilon_decay
         self.keys = []
         self.key = 0
+        self.replay_buffer = ReplayBuffer(b_size)
 
     def epsilon_greedy_policy(self, state):  # Scelta dell'azione secondo la policy epsilon-greedy
         if np.random.rand() < self.epsilon:
@@ -35,7 +52,7 @@ class QLearner:
         self.epsilon = max(self.epsilon * self.epsilon_decay, self.epsilon_min)
 
     def find_key(self, state):
-        if not(state in self.keys):
+        if not (state in self.keys):
             self.keys.append(state)
             self.key += 1
             return self.key - 1
@@ -45,3 +62,9 @@ class QLearner:
                 if self.keys[i] == state:
                     return i
                 i += 1
+
+    def add_experience_to_replay_buffer(self, experience):
+        self.replay_buffer.add_experience(experience)
+
+    def sample_batch_from_replay_buffer(self, batch_size):
+        return self.replay_buffer.sample_batch(batch_size)
