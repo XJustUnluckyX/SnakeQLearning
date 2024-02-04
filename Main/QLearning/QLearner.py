@@ -16,6 +16,11 @@ class ReplayBuffer:  # PER
     def sample_batch(self, batch_size):
         return random.sample(self.buffer, batch_size)
 
+    def get_best_experiences(self, top_n):
+        # Ordinamento delle esperienze in base alla ricompensa totale e restituisci le prime top_n esperienze
+        sorted_experiences = sorted(self.buffer, key=lambda x: x[2], reverse=True)  # x[2] è l'indice della ricompensa
+        return sorted_experiences[:top_n]
+
 
 class QLearner:
 
@@ -64,7 +69,15 @@ class QLearner:
                 i += 1
 
     def add_experience_to_replay_buffer(self, experience):
-        self.replay_buffer.add_experience(experience)
+        state, action, reward, next_state, done = experience
+        # Calcolo della ricompensa totale dell'episodio
+        total_reward = sum(e[2] for e in self.replay_buffer.buffer) + reward
+        experience_with_total_reward = (state, action, total_reward, next_state, done)
+        self.replay_buffer.add_experience(experience_with_total_reward)
 
-    def sample_batch_from_replay_buffer(self, batch_size):
-        return self.replay_buffer.sample_batch(batch_size)
+    def sample_batch_from_replay_buffer(self, batch_size, use_best_experiences):
+        if use_best_experiences:
+            best_experiences = self.replay_buffer.get_best_experiences(batch_size)
+            return best_experiences
+        else:
+            return self.replay_buffer.sample_batch(batch_size)

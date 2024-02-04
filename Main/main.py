@@ -44,7 +44,7 @@ for a in range(len(alpha)):
                                             gamma[b], epsilon_start[c], epsilon_decay[d], epsilon_min[e], b_size=10000)
 
                     # Parametri di addestramento
-                    num_episodes = 1000
+                    num_episodes = 3000
                     max_reward = -10000
                     total_score = 0
                     total_reward = 0
@@ -75,7 +75,8 @@ for a in range(len(alpha)):
 
                             if num_episodes % 32 == 0:
                                 batch_size = 32
-                                batch = q_learner.replay_buffer.sample_batch(batch_size)
+                                batch = q_learner.sample_batch_from_replay_buffer(batch_size,
+                                                                                  use_best_experiences=True)
 
                                 # Aggiornamento della Q-table utilizzando il batch campionato
                                 for experience in batch:
