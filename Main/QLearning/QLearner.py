@@ -21,6 +21,9 @@ class ReplayBuffer:  # PER
         sorted_experiences = sorted(self.buffer, key=lambda x: x[2], reverse=True)  # x[2] è l'indice della ricompensa
         return sorted_experiences[:top_n]
 
+    def reset_buffer(self):
+        self.buffer = []
+
 
 class QLearner:
 
@@ -81,3 +84,6 @@ class QLearner:
             return best_experiences
         else:
             return self.replay_buffer.sample_batch(batch_size)
+
+    def reset_buffer(self):
+        self.replay_buffer.reset_buffer()

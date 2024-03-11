@@ -15,9 +15,9 @@ grid_size = 5
 
 env = gym.make("SnakeQl", grid_size=grid_size, render_mode="human")
 
-observation_space_size = ((grid_size * grid_size) * 2 * 2) * (5 ** grid_size)
+observation_space_size = (grid_size * grid_size) * 4 * (5 ** 5)
 # Possibili posizioni per la Snake head * possibili
-# posizioni per il cibo * possibili valori delle grid_size^2 -1 azioni
+# direzioni per il cibo * possibili valori delle ultime 5 azioni
 
 action_space = [0, 1, 2, 3]
 print(observation_space_size)
@@ -44,7 +44,7 @@ for a in range(len(alpha)):
                                             gamma[b], epsilon_start[c], epsilon_decay[d], epsilon_min[e], b_size=10000)
 
                     # Parametri di addestramento
-                    num_episodes = 3000
+                    num_episodes = 1000
                     max_reward = -10000
                     total_score = 0
                     total_reward = 0

@@ -258,5 +258,5 @@ class SnakeEnv(gym.Env):
             pygame.quit()
 
     def _init_actions(self):
-        actions = np.full(5, 5)
+        actions = np.full(5, -1)
         return actions
