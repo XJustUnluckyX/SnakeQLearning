@@ -71,7 +71,7 @@ for a in range(len(alpha)):
                             q_learner.update_ql_table(int_state, action, reward, int_next_state)
 
                             experience = (state, action, reward, next_state, done)
-                            q_learner.replay_buffer.add_experience(experience)
+                            q_learner.add_experience_to_internal_buffer(experience)
 
                             if num_episodes % 32 == 0:
                                 batch_size = 32
@@ -100,6 +100,11 @@ for a in range(len(alpha)):
 
                         # Aggiornamento del tasso di esplorazione
                         q_learner.decay_epsilon()
+
+                        # Memorizza le migliori azioni nel buffer alla fine di ogni episodio
+                        q_learner.store_best_actions()
+
+                        q_learner.internal_buffer.reset_buffer()
 
                     print(f"Max reward: {max_reward}, relative length: {temp_max_length}")
                     if max_reward_grid_search < max_reward:

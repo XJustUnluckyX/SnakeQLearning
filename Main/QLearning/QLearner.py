@@ -40,8 +40,10 @@ class QLearner:
         self.keys = []
         self.key = 0
         self.replay_buffer = ReplayBuffer(b_size)
+        self.internal_buffer = ReplayBuffer(b_size)
 
     def epsilon_greedy_policy(self, state):  # Scelta dell'azione secondo la policy epsilon-greedy
+
         if np.random.rand() < self.epsilon:
             return np.random.choice(self.action_space)
         else:
@@ -71,12 +73,12 @@ class QLearner:
                     return i
                 i += 1
 
-    def add_experience_to_replay_buffer(self, experience):
+    def add_experience_to_internal_buffer(self, experience):
         state, action, reward, next_state, done = experience
-        # Calcolo della ricompensa totale dell'episodio
-        total_reward = sum(e[2] for e in self.replay_buffer.buffer) + reward
+        # Calcolo della ricompensa totale dell'episodio (cumulativa fino al dato momento)
+        total_reward = sum(e[2] for e in self.internal_buffer.buffer) + reward
         experience_with_total_reward = (state, action, total_reward, next_state, done)
-        self.replay_buffer.add_experience(experience_with_total_reward)
+        self.internal_buffer.add_experience(experience_with_total_reward)
 
     def sample_batch_from_replay_buffer(self, batch_size, use_best_experiences):
         if use_best_experiences:
@@ -85,5 +87,8 @@ class QLearner:
         else:
             return self.replay_buffer.sample_batch(batch_size)
 
-    def reset_buffer(self):
-        self.replay_buffer.reset_buffer()
+    def store_best_actions(self):
+        # Memorizza le migliori 5 azioni nel buffer a lunga durata
+        best_experiences = self.internal_buffer.get_best_experiences(5)
+        for experience in best_experiences:
+            self.replay_buffer.add_experience(experience)
