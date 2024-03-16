@@ -1,14 +1,17 @@
 # SnakeQLearning
 
 ## Introduzione
-Questo progetto è stato sviluppato come parte del corso di Intelligenza Artificiale presso l'Università degli Studi di Salerno nell'anno accademico 2023/2024. È stato realizzato da Nicolò Delogu e Davide La Gamba.
-
+Questo progetto è stato sviluppato come parte del corso di Intelligenza Artificiale presso l'Università degli Studi di Salerno nell'anno accademico 2023/2024. 
 L'obiettivo del progetto è implementare agenti intelligenti in grado di imparare a giocare al videogioco Snake. Sono stati utilizzati tre approcci principali: Q-Learning (con Prioritized Experience Replay), SARSA e Deep Q-Learning.
 
 ## Approcci Utilizzati
 1. **Q-Learning con Prioritized Experience Replay**
 2. **SARSA**
 3. **Deep Q-Learning**
+
+## Autori 
+Nicolò Delogu: [https://github.com/XJustUnluckyX]
+Davide La Gamba: [https://github.com/davide-lagamba]
 
 ## Librerie Principali
 Le principali librerie utilizzate per lo sviluppo del progetto sono:
