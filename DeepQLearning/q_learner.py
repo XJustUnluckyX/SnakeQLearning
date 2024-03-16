@@ -41,12 +41,12 @@ class QLearner:
                     status.detect_collision(pd)  # Davanti
         collision_right = status.detect_collision(pr) if status.direction == SnakeDirection.UP else \
             status.detect_collision(pl) if status.direction == SnakeDirection.DOWN else \
-                status.detect_collision(pu) if status.direction == SnakeDirection.RIGHT else \
-                    status.detect_collision(pd)  # Dx
+                status.detect_collision(pd) if status.direction == SnakeDirection.RIGHT else \
+                    status.detect_collision(pu)  # Dx
         collision_left = status.detect_collision(pr) if status.direction == SnakeDirection.DOWN else \
             status.detect_collision(pl) if status.direction == SnakeDirection.UP else \
-                status.detect_collision(pu) if status.direction == SnakeDirection.LEFT else \
-                    status.detect_collision(pd)  # Sx
+                status.detect_collision(pd) if status.direction == SnakeDirection.LEFT else \
+                    status.detect_collision(pu)  # Sx
 
         # Direzioni in cui lo snake può muoversi
         sx = 1 if status.direction == SnakeDirection.LEFT else 0
@@ -94,7 +94,7 @@ class QLearner:
         return last_movement
 
     def learn_with_long_memory(self):
-        batch_sample = random.sample(self.memory, min(len(self.memory), self.batch_size))  # Limita la dimensione del
+        batch_sample = random.sample(self.memory, k=min(len(self.memory), self.batch_size))  # Limita la dimensione del
         # campione alla dimensione della memoria disponibile
         states, actions, rewards, following_states, done = zip(*batch_sample)
         self.q_trainer.train_net(states, actions, rewards, following_states, done)
