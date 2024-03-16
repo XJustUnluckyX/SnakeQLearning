@@ -4,6 +4,9 @@ from enum import Enum
 import numpy as np
 from collections import namedtuple
 
+# E' stato utilizzato come riferimento il seguente progetto
+# https://github.com/patrickloeber/snake-ai-pytorch/tree/main , poi rifattorizzato
+
 BLOCK_SIZE = 20  # Dimensione della cella
 
 pygame.init()

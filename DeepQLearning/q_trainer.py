@@ -2,6 +2,8 @@ import torch.nn as nn
 import torch.optim as optim
 import torch
 
+# E' stato utilizzato come riferimento il seguente progetto
+# https://github.com/patrickloeber/snake-ai-pytorch/tree/main , poi rifattorizzato
 
 class QNetTrainer:
     def __init__(self, model, lr, gamma):

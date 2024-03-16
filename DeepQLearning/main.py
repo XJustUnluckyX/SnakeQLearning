@@ -3,7 +3,7 @@ from snake_env import SnakeEnv
 from plotter import plot
 
 # E' stato utilizzato come riferimento il seguente progetto
-# https://github.com/patrickloeber/snake-ai-pytorch/tree/main, poi refattizzato
+# https://github.com/patrickloeber/snake-ai-pytorch/tree/main , poi rifattorizzato
 
 # Grid Search
 learning_rate = [0.001, 0.01, 0.1]

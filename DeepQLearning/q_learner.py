@@ -6,6 +6,10 @@ from q_net import QNet
 from q_trainer import QNetTrainer
 from snake_env import SnakeDirection, Point, BLOCK_SIZE
 
+# E' stato utilizzato come riferimento il seguente progetto
+# https://github.com/patrickloeber/snake-ai-pytorch/tree/main , poi rifattorizzato
+
+
 MAX_MEMORY = 100_000
 
 

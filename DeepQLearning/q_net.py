@@ -2,6 +2,8 @@ import torch
 import torch.nn as nn
 import os
 
+# E' stato utilizzato come riferimento il seguente progetto
+# https://github.com/patrickloeber/snake-ai-pytorch/tree/main , poi rifattorizzato
 
 class QNet(nn.Module):
     def __init__(self, input_size, hidden_size, output_size):
