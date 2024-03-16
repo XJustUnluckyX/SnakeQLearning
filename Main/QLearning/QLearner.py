@@ -2,7 +2,8 @@ from random import random
 
 import numpy as np
 
-
+# E' stato utilizzato come riferimento il seguente tutorial
+# https://www.learndatasci.com/tutorials/reinforcement-q-learning-scratch-python-openai-gym/, poi modificato ed adattato
 class ReplayBuffer:  # PER
     def __init__(self, buffer_size):
         self.buffer_size = buffer_size

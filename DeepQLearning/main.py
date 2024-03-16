@@ -1,8 +1,9 @@
-from learner import QLearner
-from env import Env
+from q_learner import QLearner
+from snake_env import SnakeEnv
 from plotter import plot
 
-
+# E' stato utilizzato come riferimento il seguente progetto
+# https://github.com/patrickloeber/snake-ai-pytorch/tree/main, poi refattizzato
 
 # Grid Search
 learning_rate = [0.001, 0.01, 0.1]
@@ -22,7 +23,7 @@ for a in range(len(learning_rate)):
             for d in range(len(epsilon_decay)):
                 for e in range(len(epsilon_min)):
                     for f in range(len(batch_size)):
-                        env = Env()
+                        env = SnakeEnv()
                         # Parametri di addestramento
                         num_episodes = 500
                         max_reward = -10000
@@ -33,30 +34,31 @@ for a in range(len(learning_rate)):
                         plot_scores = []
                         plot_mean_scores = []
                         record = -1
-                        agent = QLearner(epsilon_start[c], gamma[b], learning_rate[a], batch_size[f], epsilon_decay[d], epsilon_min[e])
+                        agent = QLearner(epsilon_start[c], gamma[b], learning_rate[a], batch_size[f], epsilon_decay[d],
+                                         epsilon_min[e])
                         # Ciclo di addestramento
                         for episode in range(num_episodes):
-                            env.reset()
+                            env.respawn_snake()
                             while True:
-                                state_old = agent.get_state(env)
-                                last_move = agent.get_action(state_old)
+                                state_old = agent.compute_state(env)
+                                last_move = agent.pred_action(state_old)
                                 reward, done, score = env.step(last_move)
-                                state_new = agent.get_state(env)
-                                agent.short_memory(state_old, last_move, reward, state_new, done)
-                                agent.remember(state_old, last_move, reward, state_new, done)
+                                state_new = agent.compute_state(env)
+                                agent.learn_with_short_memory(state_old, last_move, reward, state_new, done)
+                                agent.add_to_memory(state_old, last_move, reward, state_new, done)
 
                                 if done:
-                                    env.reset()
-                                    agent.n_games += 1
-                                    agent.long_memory()
+                                    env.respawn_snake()
+                                    agent.num_games += 1
+                                    agent.learn_with_long_memory()
                                     if score > record:  # Salvo le migliori partite
                                         record = score
                                         agent.deep_model.save_model()
 
-                                    print('Game', agent.n_games, 'Score', score, 'Record:', record)
+                                    print('Game', agent.num_games, 'Score', score, 'Record:', record)
 
                                     total_score += score
-                                    mean_score = total_score / agent.n_games
+                                    mean_score = total_score / agent.num_games
                                     plot_scores.append(score)
                                     plot_mean_scores.append(mean_score)
                                     plot(plot_scores, plot_mean_scores)
