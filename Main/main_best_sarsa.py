@@ -44,14 +44,14 @@ with open('sarsa_learner.pkl', 'rb') as input_file:
 
         while True:
             # Conversione dello stato in un intero, per poter definire la riga corrispondente nella
-            # tabella del Q-learning
+            # tabella del Sarsa
             str_state = re.sub("[^0-9]", "", str(state))
             int_state = int(str_state)
             action = best_sarsa_learner.epsilon_greedy_policy(int_state)
             next_state, reward, done, length, info = env.step(action)
             str_next_state = re.sub("[^0-9]", "", str(next_state))
             int_next_state = int(str_state)
-            # Modifica dell'aggiornamento della Q-table con ricompensa intermedia
+            # Modifica dell'aggiornamento della Sarsa-table con ricompensa intermedia
             best_sarsa_learner.update_sarsa_table(int_state, action, reward, int_next_state)
 
             total_reward += reward

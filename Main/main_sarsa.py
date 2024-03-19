@@ -38,7 +38,7 @@ for a in range(len(alpha)):
             for d in range(len(epsilon_decay)):
                 for e in range(len(epsilon_min)):
 
-                    # Creazione dell'agente Q-learning con i parametri della Grid Search
+                    # Creazione dell'agente Sarsa con i parametri della Grid Search
                     sarsa = Sarsa.Sarsa(observation_space_size, action_space, alpha[a],
                                         gamma[b], epsilon_start[c], epsilon_decay[d], epsilon_min[e])
 
@@ -59,14 +59,14 @@ for a in range(len(alpha)):
 
                         while True:
                             # Conversione dello stato in un intero, per poter definire la riga corrispondente nella
-                            # tabella del Q-learning
+                            # tabella del Sarsa
                             str_state = re.sub("[^0-9]", "", str(state))
                             int_state = int(str_state)
                             action = sarsa.epsilon_greedy_policy(int_state)
                             next_state, reward, done, length, info = env.step(action)
                             str_next_state = re.sub("[^0-9]", "", str(next_state))
                             int_next_state = int(str_state)
-                            # Modifica dell'aggiornamento della Q-table con ricompensa intermedia
+                            # Modifica dell'aggiornamento della Sarsa-table con ricompensa intermedia
                             sarsa.update_sarsa_table(int_state, action, reward, int_next_state)
 
                             total_reward += reward

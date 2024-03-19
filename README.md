@@ -20,8 +20,9 @@ Le principali librerie utilizzate per lo sviluppo del progetto sono:
 - **torch**
 
 ## Riferimenti
-- Per la realizzazione dell'agente Deep Q-Learning ci siamo basati su questa guida, apportando modifiche e rifattorizzazioni: [GitHub - snake-ai-pytorch](https://github.com/patrickloeber/snake-ai-pytorch/tree/main)
+- Per la realizzazione dell'agente Deep Q-Learning ci siamo basati su questa guida, aggiungendo Grid Search e rifattorizzazioni: [GitHub - snake-ai-pytorch](https://github.com/patrickloeber/snake-ai-pytorch/tree/main)
 - Per la realizzazione del Q-Learner e, di conseguenza, dell'agente SARSA, ci siamo ispirati a questa guida: [Reinforcement Q-Learning from Scratch in Python with OpenAI Gym](https://www.learndatasci.com/tutorials/reinforcement-q-learning-scratch-python-openai-gym/)
 
 ---
 **Nota:** Questo progetto è stato realizzato per scopi accademici e di apprendimento. 
+**Nota:** Per installare l'environment Gym custom,  eseguire il comando  pip install -e Path\SnakeQLearning\Environment all'interno di un venv.
